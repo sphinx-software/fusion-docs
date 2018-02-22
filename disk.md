@@ -1,130 +1,94 @@
-@Fusion/disk
-===============
+# Disk Fusion
 
-## A queue for Fusion 
- - default support local disk
+Disk 
 
-## Config disk
+## Installation
+The DiskProvider will read and provide all disks with the properties of disks in the config.
+Of course, you may configure as many disks as you want, and may even have multiple disks that use the same driver.
+The default disk provider with the name is configured. DiskManager supports the default local driver. See also the api config at the bottom of the page
+
+
+
+For example config
 ```js
-disk =  {
+{
     default: 'myDisk',
     disks  : {
         myDisk: {
-            adapter  : 'local', // type for disk
-            directory: path.join(__dirname, '..', 'public')
+            driver    : 'local',
+            directory : path.join(__dirname, '..', 'public')
         },
         ...
     },
-};
-```
-## provide Disk
-
-```js
-export * from 'Fusion/Disk';
+}
 ```
 
-## get instance Disk
+### Usage
+DiskManagerInterface provides default in Fusion
+Using @singleton get an entity of DiskManger
 
-```js
+You have to use Disk Manager get an entity or register new Disk
+```js 
+import { DiskManagerInterface }  from "Fusion";
+
 @singleton(DiskManagerInterface)
 @controller()
 class Controller {
     
     constructor(diskManager) {
-        
-        this.myDisk = diskManager.disk('myDisk');
-        this.myDisk.createWriteStream('dir1/dir2/nameFile')
-        this.myDisk.createReadStream('dir1/dir2/nameFile')
-        
+        // The disk manager is available here
+        this.myDisk = diskManager.disk() // like diskManager.disk('myDisk')
+        // If the parameter name in the [disk] action does not exist, Disk Manager will provide the default name
     }
-    
 }
 ```
 
-## custom disk 
-
-Create new Disk
+## Save File 
+createWriteStreamm(nameFile) returns WriteableStream
+Create a WriteableStream stream ready to listen to write data
+You can save a string like the example below
 ```js
-/**
- * @implements DiskInterface
- * implement all method diskInterface
- */
-class S3Disk {
-    
-    setBucket(nameBucket) {
-        return this;
-    }
-    
-    /**
-    *
-    * @param {String} fileName
-    * @param {'public' | 'private' | String} permission
-    * @return {WriteStream}
-    */
-    createWriteStream(fileName, permission) {
-        ...
-    }
-    
-    /**
-    *
-    * @param {String} fileName
-    * @return {ReadableStream}
-    */
-    createReadStream(fileName) {
-        ...
-    }
-    
-    /**
-    *
-    * @param {String} fileName
-    * @return {Promise<boolean>}
-    */
-    exists(fileName) {
-        ...
-    }
-    
-    /**
-    *
-    * @param {String} fileName
-    * @return {Promise<boolean>}
-    */
-    delete(fileName) {
-        ...
-    }
-    
-}
+// Save the ReadableSteam with a file named fileName
+let someReadableStream ....;
+myDisk.createWriteStream('fileName').pipe(someReadableStream);
+// Save the 'somthing content' with a file named fileName.txt
+myDisk.createWriteStream('fileName.txt').end('something content');
+```
+## Check For An Existing File
+exists(nameFile) returns Promise<boolean>
+The method will check the existing file
+```js
+myDisk.exists('fileName.txt').then(fileExits => {
+    // fileExits is boolean
+});
+```
+## Delete File
+exists(nameFile) returns Promise<boolean>
+The method will delete the existing file
+```js
+myDisk.delete('fileName.txt').then(fileExits => {
+    // File has been deleted
+});
+```
+## Get File
+createReadStream(nameFile) returns ReadableStream
+Create a readable stream to read the contents of the remote file. It can be piped to a writable stream or listened to for 'data' events to read a file's contents.
 
+```js
+let someWriteableStream ....;
+someWriteableStream.pipe(myDisk.createReadStream('fileName.tx'));
 ```
 
-Register new Type Disk
-```js
-@provider()
-export class MyProvider {
 
-    constructor(container) {
-        this.container = container;
-    }
 
-    register() {
-        this.container
-            .made(DiskManagerInterface,(diskManager) => {
-                diskManager.registerForType('s3', (config) => new S3Disk().setBucket(config.bucket));
-            });
-    }
 
-}
-```
 
-## Config custom disk
-```js
-disk =  {
-    default: 'myDisk',
-    disks  : {
-        myDisk: {
-            adapter : 's3', // type for disk
-            bucket  : 'nameMyBucket' 
-        },
-        ...
-    },
-};
-```
+
+
+
+
+
+
+
+
+
