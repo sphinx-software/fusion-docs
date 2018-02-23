@@ -63,8 +63,8 @@ You can save a string like the example below
 // Save the ReadableSteam with a file named fileName
 let someReadableStream ....;
 myDisk.createWriteStream('fileName').pipe(someReadableStream);
-// Save the 'somthing content' with a file named fileName.txt
-myDisk.createWriteStream('fileName.txt').end('something content');
+// Save the 'somthing content' with a file named fileName.txt in directory dir/dir2
+myDisk.createWriteStream('dir/dir2/fileName.txt').end('something content');
 ```
 ## Check For An Existing File
 exists(nameFile) returns Promise<boolean>
