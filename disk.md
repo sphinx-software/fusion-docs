@@ -40,6 +40,16 @@ class Controller {
         this.myDisk = diskManager.disk() // like diskManager.disk('myDisk')
         // If the parameter name in the [disk] action does not exist, Disk Manager will provide the default name
     }
+    
+    saveFile() {
+        let someReadSteam ....;
+        
+        this.myDisk.createWriteStream('fileName').pipe(someReadSteam)
+    }
+    
+    saveTextFile() {
+        this.myDisk.createWriteStream('fileName').pipe(someReadSteam)
+    }
 }
 ```
 
@@ -78,12 +88,34 @@ Create a readable stream to read the contents of the remote file. It can be pipe
 let someWriteableStream ....;
 someWriteableStream.pipe(myDisk.createReadStream('fileName.tx'));
 ```
+## Custom disk
 
+In order to set up the custom my disk you will need a disk. Let's add a class and implements DiskInterface from Fusion:
 
+```js
+import { DiskInterface } from 'Fusion';
+/**
+ * @implements DiskInterface
+ */
+export default class S3Disk {
+...
+```
+Next, you should create a service provider such as S3ServiceProvider. In the provider's  boot method, you may use the DiskManagerInterface extend method to define the custom driver:
 
+```js
+import { DiskManagerInterface } from 'Fusion';
+@provider()
+export class S3ServiceProvider {
 
-
-
+    constructor(container) {
+        this.container = container;
+    }
+    async boot() {
+        let diskManager = await this.container.make(DiskManagerInterface);
+        diskManager.extend('s3', (config) => new S3Disk(config));
+    }
+}
+```
 
 
 
