@@ -6,9 +6,6 @@ Disk
 The DiskProvider will read and provide all disks with the properties of disks in the config.
 Of course, you may configure as many disks as you want, and may even have multiple disks that use the same driver.
 The default disk provider with the name is configured. DiskManager supports the default local driver. See also the api config at the bottom of the page
-
-
-
 For example config
 ```js
 {
@@ -21,6 +18,11 @@ For example config
         ...
     },
 }
+```
+
+Remember to use the disk service in the file manifest
+```js
+export * from 'Fusion/disk';
 ```
 
 ### Usage
